@@ -30,7 +30,7 @@ An example query to a search app running on host "testhost.edc.renci.org" to fin
 
 curl -X Get  http://testhost.edc.renci.org:5000/query?query="high%20blood%20pressure" 
 
-Installing on the Mac for python 3.9 (loadDenseVectors and dugSearchApp)
+Installing on the Mac for python 3.9 (loadDenseVectors and dugSearchApp).  I suspect this would also work on Linux/Python 3.9, but I haven't tested it yet.
 
 Start by downloading and starting the latest version of ElasticSearch from
 
