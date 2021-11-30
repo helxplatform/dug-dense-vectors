@@ -64,6 +64,7 @@ def insertDataIntoIndex(fileList, indexName, esConn):
                         'row_id':  rowId }
           rowId += 1
           esConn.index(index=indexName, body=insertBody)
+    print(f"number of rows inserted is {rowId - 1}")
 
 def connectElastic(ip, port):
     # Connect to an elasticsearch node with the given ip and port

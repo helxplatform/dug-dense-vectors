@@ -3,6 +3,7 @@ from flask_cors import CORS
 from biobert_embedding.embedding import BiobertEmbedding
 from elasticsearch import Elasticsearch
 import sys
+from timeit import default_timer as timer
 
 # Define the app
 app = Flask(__name__)
@@ -62,10 +63,16 @@ def semanticSearch(queryVec, index, thresh=1.2, top_n=10):
         }
     }
     # Semantic vector search with cosine similarity
+    start = timer()
     result = esConn.search(index=index, body=s_body)
+    end = timer()
+    searchTime = end - start
+    print (end - start)
+
     total_match = len(result["hits"]["hits"])
     print("Total Matches: ", str(total_match))
     data = []
+    data.append({'search_time': searchTime})
     if total_match > 0:
         row_ids = []
         for hit in result["hits"]["hits"]:
