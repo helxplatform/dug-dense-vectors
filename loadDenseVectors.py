@@ -26,6 +26,7 @@ def main(args):
    # Extract command line args
    indexName = args.indexName
    inputDir = Path(args.inputDir)
+   iterations = int(args.iterations)
 
    # Connect to elasticSearch
    esConn = connectElastic(config.ELASTIC_IP, config.ELASTIC_PORT)
@@ -39,9 +40,9 @@ def main(args):
    # contains one "." hidden file for each regular files.  Those
    # files don't seem to be valid xml, which accounts for the "[!.]" in the glob
    fileList = [f for f in inputDir.resolve().glob('**/[!.]*.xml') if f.is_file()]
-   insertDataIntoIndex(fileList, indexName, esConn)
+   insertDataIntoIndex(fileList, indexName, iterations, esConn)
 
-def insertDataIntoIndex(fileList, indexName, esConn):
+def insertDataIntoIndex(fileList, indexName, iterations, esConn):
     # Get biobert
     biobert = BiobertEmbedding()
     rowId = 1
@@ -51,19 +52,23 @@ def insertDataIntoIndex(fileList, indexName, esConn):
        print(fileName)
        tree = ET.parse(fileName)
        root = tree.getroot()
-       for variable in root.iter('variable'):
-          varId = variable.attrib['id']
-          description = variable.find('description').text
-          name = variable.find('name').text
-          print(f"varId: {varId}, name: {name}, description: {description}")
-          sentenceEmbedding = biobert.sentence_vector(description)
-          sentenceArray = sentenceEmbedding.numpy()
-          insertBody = {'variable_id': f"{varId} {name}",
-                        'description': description,
-                        'description_vec':  sentenceArray,
-                        'row_id':  rowId }
-          rowId += 1
-          esConn.index(index=indexName, body=insertBody)
+       for iteration in range(iterations):
+          print (f"iteration number: {iteration}")
+          for variable in root.iter('variable'):
+             varIdRaw = variable.attrib['id']
+             varId = varIdRaw + " " + str(iteration)
+             descriptionRaw = variable.find('description').text
+             description = descriptionRaw + " " + str(iteration)
+             name = variable.find('name').text
+#            print(f"varId: {varId}, name: {name}, description: {description}")
+             sentenceEmbedding = biobert.sentence_vector(description)
+             sentenceArray = sentenceEmbedding.numpy()
+             insertBody = {'variable_id': f"{varId} {name}",
+                           'description': description,
+                           'description_vec':  sentenceArray,
+                           'row_id':  rowId }
+             rowId += 1
+             esConn.index(index=indexName, body=insertBody)
     print(f"number of rows inserted is {rowId - 1}")
 
 def connectElastic(ip, port):
@@ -98,6 +103,9 @@ def createIndex(indexName, esConn):
                     "type": "long"
                 }
             }
+        },
+        "settings": {
+           "number_of_shards": 4
         }
     }
     try:
@@ -120,6 +128,9 @@ if __name__ == '__main__':
                         help= "Specify the dir containing the files to load")
     parser.add_argument('--indexName',  action="store", 
                         help ="The name of the index in to which to load the data")
+    parser.add_argument('--iterations',  action="store", 
+                        help ="The number of times to load the data: used for performance testing",
+                        default =1)
 
     args = parser.parse_args()
 
