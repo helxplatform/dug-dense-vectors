@@ -7,7 +7,8 @@
 | dug1         | 6071                | 86.9 mb    |
 | dug3         | 30355               | 437.8 mb   |
 | dug10        | 60710               | 876.3 mb   |
-| dug10-shard4 | 60710               | 876.3 mb   |
+| dug10-shard4 | 60710               | 878.2 mb   |
+| dug10-shard6 | 60710               | 879.3 mb   |
 | dug100       | 607100              | 8.5 gb      |
 
 ### Query results
@@ -19,4 +20,5 @@ Query used is http://localhost:5000/query?query=blood%20sugar. All times in seco
 | dug3         | .357 | .112 | .105 | .100 | .108 |
 | dug10        | .873 | .202 | .218 | .200 | .208 |
 | dug10-shard4 | .341 | .075 | .076 | .069 | .070 |
+| dug10-shard6 | .429 | .097 | .091 | .091 | .089 |
 | dug100       | 9.25 | 1.85 | 1.82 | 1.77 | 1.78 |
